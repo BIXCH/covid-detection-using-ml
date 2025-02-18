@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID Detection</title>
+    <!-- Google Font Link -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6e7c7c, #f4f4f9);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #4CAF50;
+        }
+
+        .file-input {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .submit-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s ease;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        .prediction-result {
+            margin-top: 20px;
+        }
+
+        .prediction-result h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .uploaded-image {
+            margin-top: 10px;
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+        }
+
+        /* Media Query for Smaller Screens */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            .submit-btn {
+                max-width: 100%;
+            }
+
+            .file-input {
+                max-width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>COVID Detection from X-ray Images</h1>
+        <form action="/predict" method="POST" enctype="multipart/form-data" class="upload-form">
+            <label for="file" class="form-label">Upload an X-ray Image:</label>
+            <input type="file" name="file" id="file" class="file-input" required>
+            <button type="submit" class="submit-btn">Predict</button>
+        </form>
+
+        {% if prediction %}
+        <div class="prediction-result">
+            <h3>Prediction: {{ prediction }}</h3>
+            <img src="{{ url_for('static', filename='uploaded_images/' + filename) }}" alt="Uploaded Image" class="uploaded-image">
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

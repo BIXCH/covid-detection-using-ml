@@ -1,0 +1,94 @@
+import os
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras import layers, models
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+# Define directories for training and testing
+train_dir = 'D:/new/Covid19-dataset/train'
+test_dir = 'D:/new/Covid19-dataset/test'
+
+# Check if directories exist
+if not os.path.exists(train_dir):
+    print(f"Training directory not found: {train_dir}")
+    exit()
+
+if not os.path.exists(test_dir):
+    print(f"Testing directory not found: {test_dir}")
+    exit()
+
+# Image size and batch size
+img_size = (150, 150)
+batch_size = 32
+
+# Step 1: Preprocessing Data using ImageDataGenerator
+train_datagen = ImageDataGenerator(
+    rescale=1./255,
+    shear_range=0.2,
+    zoom_range=0.2,
+    horizontal_flip=True)
+
+test_datagen = ImageDataGenerator(rescale=1./255)
+
+# Create train and test generators
+train_generator = train_datagen.flow_from_directory(
+    train_dir,
+    target_size=img_size,
+    batch_size=batch_size,
+    class_mode='binary')
+
+test_generator = test_datagen.flow_from_directory(
+    test_dir,
+    target_size=img_size,
+    batch_size=batch_size,
+    class_mode='binary')
+
+# Step 2: Define the CNN Model
+model = models.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(150, 150, 3)),
+    layers.MaxPooling2D((2, 2)),
+    
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    
+    layers.Conv2D(128, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    
+    layers.Flatten(),
+    layers.Dense(512, activation='relu'),
+    layers.Dense(1, activation='sigmoid')
+])
+
+# Step 3: Compile the Model
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Step 4: Train the Model
+history = model.fit(
+    train_generator,
+    steps_per_epoch=train_generator.samples // batch_size,
+    epochs=5,
+    validation_data=test_generator,
+    validation_steps=test_generator.samples // batch_size
+)
+
+# Step 5: Save the Model
+save_path = 'D:/new/Covid19-dataset/covid_xray_model.h5'
+
+# Check if the directory exists before saving
+if not os.path.exists(os.path.dirname(save_path)):
+    print(f"Directory for saving model not found: {os.path.dirname(save_path)}")
+    exit()
+
+# Print the save path to verify it's correct
+print(f"Saving model to: {save_path}")
+
+# Save the model
+model.save(save_path, save_format='h5')
+print(f"Model saved as {save_path}")
+
+
+from tensorflow.keras.models import load_model
+
+# Load the saved model
+model_path = 'D:/new/Covid19-dataset/covid_xray_model.h5'
+model = load_model(model_path)
